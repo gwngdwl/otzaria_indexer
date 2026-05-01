@@ -115,22 +115,28 @@ jobs:
             --notes "$(cat <<'EOF'
           ## התקנה
 
-          אם הקובץ מפוצל (part*), הורד את כל החלקים ואחד אותם תחילה:
+          ### שלב 1 — הורד את כל הקבצים
+          הורד את כל קבצי `otzaria_index.tar.zst.part*` מה-release הזה.
+
+          ### שלב 2 — אחד את החלקים
           ```bash
+          # Linux / macOS / Windows (PowerShell)
           cat otzaria_index.tar.zst.part* > otzaria_index.tar.zst
           ```
 
-          לאחר מכן חלץ לתיקיית הנתונים של אוצריא:
-             - **Windows**: `%APPDATA%\otzaria\`
-             - **Linux**: `~/.local/share/otzaria/`
-             - **macOS**: `~/Library/Application Support/otzaria/`
-
+          ### שלב 3 — חלץ לתיקיית הנתונים של אוצריא
           ```bash
           # Linux / macOS
           tar -xf otzaria_index.tar.zst -C ~/.local/share/otzaria/
 
+          # macOS (אלטרנטיבה)
+          tar -xf otzaria_index.tar.zst -C ~/Library/Application\ Support/otzaria/
+
           # Windows (PowerShell)
           tar -xf otzaria_index.tar.zst -C "$env:APPDATA\otzaria\"
           ```
+
+          לאחר החילוץ תיווצרנה תיקיות `index/` ו-`tantivy.lock/` במקום הנכון.
+          פתח את אוצריא — האינדקס יהיה מוכן לשימוש מיידי.
           EOF
           )"
