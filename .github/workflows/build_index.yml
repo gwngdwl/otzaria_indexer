@@ -78,7 +78,7 @@ jobs:
           # or ~/.local/share/otzaria/ (Linux/macOS).
           # Extract with: tar -xf otzaria_index.tar.zst -C <otzaria-data-dir>
 
-          tar --use-compress-program='zstd -19 -T0' \
+          tar --use-compress-program='zstd -3 -T0' \
             -cf otzaria_index.tar.zst \
             -C build \
             index \
