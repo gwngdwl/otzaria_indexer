@@ -92,7 +92,7 @@ class Indexer {
         onBookDone?.call(key);
       } catch (e) {
         stats.booksErrored++;
-        // Continue with next book — don't abort the entire run
+        print('ERROR indexing book ${book.id} "${book.title}": $e');
       }
 
       // Commit every 25 books to persist progress
