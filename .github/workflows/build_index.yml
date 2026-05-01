@@ -70,14 +70,6 @@ jobs:
 
       - name: Package index and tantivy.lock
         run: |
-          # build/
-          #   index/          ← Tantivy index files
-          #   tantivy.lock/   ← Hive state (books_indexed, index-state-version, etc.)
-          #
-          # The archive root maps directly to %APPDATA%\otzaria\ (Windows)
-          # or ~/.local/share/otzaria/ (Linux/macOS).
-          # Extract with: tar -xf otzaria_index.tar.zst -C <otzaria-data-dir>
-
           tar --use-compress-program='zstd -3 -T0' \
             -cf otzaria_index.tar.zst \
             -C build \
@@ -85,8 +77,14 @@ jobs:
             tantivy.lock
 
           echo "Archive size: $(du -sh otzaria_index.tar.zst | cut -f1)"
-          echo "Archive contents:"
-          tar --use-compress-program='zstd -d' -tf otzaria_index.tar.zst | head -20
+
+          # Split into 1900MB parts if needed (GitHub Releases limit is 2GB)
+          SIZE=$(stat -c%s otzaria_index.tar.zst)
+          if [ "$SIZE" -gt 1990000000 ]; then
+            split -b 1900m otzaria_index.tar.zst otzaria_index.tar.zst.part
+            rm otzaria_index.tar.zst
+            ls -lh otzaria_index.tar.zst.part*
+          fi
 
       - name: Get release tag
         id: tag
@@ -96,14 +94,25 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Collect assets: split parts if they exist, otherwise the single file
+          if ls otzaria_index.tar.zst.part* 2>/dev/null; then
+            ASSETS=$(ls otzaria_index.tar.zst.part*)
+          else
+            ASSETS=otzaria_index.tar.zst
+          fi
+
           gh release create "${{ steps.tag.outputs.tag }}" \
-            otzaria_index.tar.zst \
+            $ASSETS \
             --title "Otzaria Search Index ${{ steps.tag.outputs.tag }}" \
             --notes "$(cat <<'EOF'
           ## התקנה
 
-          1. הורד את `otzaria_index.tar.zst`
-          2. חלץ לתיקיית הנתונים של אוצריא:
+          אם הקובץ מפוצל (part*), הורד את כל החלקים ואחד אותם תחילה:
+          ```bash
+          cat otzaria_index.tar.zst.part* > otzaria_index.tar.zst
+          ```
+
+          לאחר מכן חלץ לתיקיית הנתונים של אוצריא:
              - **Windows**: `%APPDATA%\otzaria\`
              - **Linux**: `~/.local/share/otzaria/`
              - **macOS**: `~/Library/Application Support/otzaria/`
@@ -115,8 +124,5 @@ jobs:
           # Windows (PowerShell)
           tar -xf otzaria_index.tar.zst -C "$env:APPDATA\otzaria\"
           ```
-
-          לאחר החילוץ תיווצרנה תיקיות `index/` ו-`tantivy.lock/` במקום הנכון.
-          פתח את אוצריא — האינדקס יהיה מוכן לשימוש מיידי.
           EOF
           )"
