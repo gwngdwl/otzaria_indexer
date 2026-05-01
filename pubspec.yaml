@@ -1,20 +1,24 @@
 name: otzaria_indexer
-description: A sample command-line application.
+description: Builds a Tantivy search index for the Otzaria library from the latest seforim.db.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/Otzaria/otzaria_indexer
+publish_to: none
 
 environment:
-  sdk: ^3.11.4
+  sdk: ^3.8.0
 
-# Add regular dependencies here.
 dependencies:
   path: ^1.9.0
-
-dev_dependencies:
-  lints: ^6.0.0
-  test: ^1.25.6
-
+  http: ^1.2.0
+  sqlite3: ^2.4.0
+  args: ^2.5.0
   search_engine:
     git:
       url: https://github.com/Y-PLONI/otzaria_search_engine
       ref: use-regex
+  hive_ce: ^2.19.3
+  crypto: ^3.0.7
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
