@@ -35,6 +35,13 @@ jobs:
       - name: Get dependencies
         run: dart pub get
 
+      - name: Build native search_engine library
+        run: |
+          dart run tool/build_search_engine.dart
+          MANIFEST=$(dart run tool/build_search_engine.dart --check)
+          LIB_DIR=$(dirname "$MANIFEST")/target/release
+          echo "FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR=$LIB_DIR" >> $GITHUB_ENV
+
       - name: Download latest seforim.db.zst
         run: |
           RELEASE_URL="https://api.github.com/repos/Otzaria/SeforimLibrary/releases/latest"
