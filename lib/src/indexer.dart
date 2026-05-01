@@ -127,9 +127,7 @@ class Indexer {
 
 extension on BookRow {
   bool get isFileBacked {
-    final path = filePath?.trim();
-    if (path == null || path.isEmpty) return false;
     final type = (fileType ?? 'txt').toLowerCase();
-    return type != 'link' && type != 'url';
+    return type == 'pdf' || type == 'epub' || type == 'docx';
   }
 }
