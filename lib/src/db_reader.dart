@@ -50,11 +50,18 @@ class DbReader {
 
   void close() => _db.dispose();
 
+  bool _columnExists(String table, String column) {
+    final rows = _db.select('PRAGMA table_info($table)');
+    return rows.any((r) => r['name'] as String == column);
+  }
+
   List<BookRow> getAllBooks() {
+    final hasExternalLibraryId = _columnExists('book', 'externalLibraryId');
+    final extCol = hasExternalLibraryId ? 'externalLibraryId,' : 'NULL AS externalLibraryId,';
     return _db
         .select('''
       SELECT id, categoryId, title, fileType, filePath,
-             externalLibraryId, COALESCE(orderIndex, 999) AS orderIndex,
+             $extCol COALESCE(orderIndex, 999) AS orderIndex,
              COALESCE(totalLines, 0) AS totalLines
       FROM book
       WHERE COALESCE(fileType, 'txt') NOT IN ('link', 'url')
