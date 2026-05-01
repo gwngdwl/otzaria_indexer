@@ -133,6 +133,7 @@ Future<void> _buildIndex({
 
   final indexer = Indexer(db: db, engine: engine);
 
+  print('Progress: ${tracker.done.length} books already indexed');
   print('Starting indexing...');
   final stopwatch = Stopwatch()..start();
   var lastSave = DateTime.now();
