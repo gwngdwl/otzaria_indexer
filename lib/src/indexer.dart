@@ -10,6 +10,7 @@ class IndexStats {
   int booksSkipped = 0;
   int booksErrored = 0;
   int totalDocuments = 0;
+  int totalBooks = 0;
   String catalogueOrderSignature = '';
 }
 
@@ -36,6 +37,7 @@ class Indexer {
     final allTopics = _db.getAllBookTopics();
     final books = _db.getAllBooks();
     final total = books.length;
+    stats.totalBooks = total;
 
     // Compute SHA1 of the catalogue order — matches IndexingRepository.buildCatalogueOrderSignature
     final orderedKeys = books.map(_catalogueKey).toList();

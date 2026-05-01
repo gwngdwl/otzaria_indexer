@@ -170,6 +170,18 @@ Future<void> _buildIndex({
   print('  Books errored:   ${stats.booksErrored}');
   print('  Total documents: ${stats.totalDocuments}');
   print('  Index written to: $outputDir');
+
+  final processed = stats.booksIndexed + stats.booksSkipped + stats.booksErrored;
+  if (processed < stats.totalBooks) {
+    stderr.writeln(
+      'ERROR: only $processed/${stats.totalBooks} books processed — index is incomplete',
+    );
+    exitCode = 1;
+    return;
+  }
+  if (stats.booksErrored > 0) {
+    stderr.writeln('WARNING: ${stats.booksErrored} books failed with errors');
+  }
 }
 
 String _formatDuration(Duration d) {
