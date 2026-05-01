@@ -70,20 +70,28 @@ jobs:
 
       - name: Package index and tantivy.lock
         run: |
-          tar --use-compress-program='zstd -3 -T0' \
+          echo "Input sizes:"
+          du -sh build/index build/tantivy.lock
+
+          echo "Compressing..."
+          time tar --use-compress-program='zstd -3 -T0' \
             -cf otzaria_index.tar.zst \
             -C build \
             index \
             tantivy.lock
 
-          echo "Archive size: $(du -sh otzaria_index.tar.zst | cut -f1)"
+          echo "Archive size: $(du -sh otzaria_index.tar.zst | cut -f1) ($(stat -c%s otzaria_index.tar.zst) bytes)"
 
           # Split into 1900MB parts if needed (GitHub Releases limit is 2GB)
           SIZE=$(stat -c%s otzaria_index.tar.zst)
           if [ "$SIZE" -gt 1990000000 ]; then
+            echo "Archive exceeds 1.9GB, splitting..."
             split -b 1900m otzaria_index.tar.zst otzaria_index.tar.zst.part
             rm otzaria_index.tar.zst
+            echo "Split parts:"
             ls -lh otzaria_index.tar.zst.part*
+          else
+            echo "Archive fits in a single file, no split needed."
           fi
 
       - name: Get release tag
