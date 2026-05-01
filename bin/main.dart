@@ -114,11 +114,15 @@ Future<void> _buildIndex({
 }) async {
   final indexDir = Directory(outputDir);
 
+  final lockDir = Directory(p.join(p.dirname(p.absolute(outputDir)), 'tantivy.lock'));
+
   if (fresh) {
     print('--fresh: clearing existing index and progress...');
+    print('  index dir:  ${p.absolute(outputDir)}  exists=${indexDir.existsSync()}');
+    print('  lock dir:   ${lockDir.path}  exists=${lockDir.existsSync()}');
     if (indexDir.existsSync()) indexDir.deleteSync(recursive: true);
-    final lockDir = Directory(p.join(p.dirname(outputDir), 'tantivy.lock'));
     if (lockDir.existsSync()) lockDir.deleteSync(recursive: true);
+    print('  deleted.');
   }
 
   indexDir.createSync(recursive: true);
