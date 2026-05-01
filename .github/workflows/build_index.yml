@@ -4,11 +4,6 @@ on:
   repository_dispatch:
     types: [seforim-library-release]
   workflow_dispatch:
-    inputs:
-      release_tag:
-        description: 'SeforimLibrary release tag (leave empty for latest)'
-        required: false
-        default: ''
 
 permissions:
   contents: write
@@ -42,11 +37,7 @@ jobs:
 
       - name: Download latest seforim.db.zst
         run: |
-          if [ -n "${{ github.event.inputs.release_tag }}" ]; then
-            RELEASE_URL="https://api.github.com/repos/Otzaria/SeforimLibrary/releases/tags/${{ github.event.inputs.release_tag }}"
-          else
-            RELEASE_URL="https://api.github.com/repos/Otzaria/SeforimLibrary/releases/latest"
-          fi
+          RELEASE_URL="https://api.github.com/repos/Otzaria/SeforimLibrary/releases/latest"
 
           ASSET_URL=$(curl -fsSL \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
