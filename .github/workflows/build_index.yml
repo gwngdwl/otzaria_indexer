@@ -50,7 +50,7 @@ jobs:
 
       - name: Decompress seforim.db
         run: |
-          zstd -d seforim.db.zst -o seforim.db
+          zstd -d --long=31 seforim.db.zst -o seforim.db
           rm seforim.db.zst
           echo "Decompressed: $(du -sh seforim.db | cut -f1)"
 
