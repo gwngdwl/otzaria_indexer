@@ -68,6 +68,20 @@ jobs:
             --output build/index \
             --fresh
 
+      - name: Verify index was fully built
+        run: |
+          META=build/index/meta.json
+          if [ ! -f "$META" ]; then
+            echo "ERROR: meta.json missing — index was not written"
+            exit 1
+          fi
+          NUM_DOCS=$(python3 -c "import json,sys; d=json.load(open('$META')); print(sum(s.get('num_docs',0) for s in d.get('segments',[])))")
+          echo "Documents in index: $NUM_DOCS"
+          if [ "$NUM_DOCS" -lt 100000 ]; then
+            echo "ERROR: index has only $NUM_DOCS documents — likely incomplete (OOM or crash)"
+            exit 1
+          fi
+
       - name: Package index and tantivy.lock
         run: |
           # build/
